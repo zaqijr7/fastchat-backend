@@ -2,7 +2,7 @@ const userModel = require('../models/users')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { APP_KEY } = process.env
-// const responseStatus = require('../helpers/responseStatus')
+const responseStatus = require('../helpers/responseStatus')
 const { sendEmail } = require('../helpers/sendMail')
 
 // <-------------CONTROLLERS--------->
@@ -68,6 +68,38 @@ exports.register = async (req, res) => {
     return res.status(400).json({
       success: false,
       message: 'Please try again leter'
+    })
+  }
+}
+
+exports.login = async (req, res) => {
+  const { email, pin } = req.body
+  try {
+    const existingUser = await userModel.getUsersByConditionAsync({ email })
+    if (existingUser.length > 0) {
+      const compare = await bcrypt.compare(pin, existingUser[0].pin)
+      if (compare) {
+        const id = existingUser[0].id_user
+        const token = jwt.sign({ id, email: email }, APP_KEY)
+        return res.status(200).json({
+          success: true,
+          message: 'Login Successfully',
+          results: {
+            email: existingUser[0].email,
+            token
+          }
+
+        })
+      }
+    }
+    return res.status(404).json({
+      success: false,
+      message: 'PIN is Wrong'
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: responseStatus.serverError(res)
     })
   }
 }

@@ -23,17 +23,17 @@ io.on('connection', () => {
 const socket = require('./src/middlewares/socket')
 app.use(socket(io))
 
-app.use(BodyParser.urlencoded({ extended: false }))
+app.use(BodyParser.urlencoded())
 app.use(morgan('dev'))
 app.use(cors('*'))
 app.use('/uploads', express.static('uploads'))
 
 // <----------ROUTER---------->
 app.use('/auth', require('./src/routers/auth'))
-// app.use('/chat', require('./src/routers/chat'))
-// app.use('/history', require('./src/routers/history'))
-// app.use('/profile', require('./src/routers/profile'))
-// app.use('/allUser', require('./src/routers/users'))
+app.use('/chat', require('./src/routers/chat'))
+app.use('/history', require('./src/routers/history'))
+app.use('/profile', require('./src/routers/profile'))
+app.use('/allUser', require('./src/routers/users'))
 
 // <----------URL PORT---------->
 app.get('/', (req, res) => {

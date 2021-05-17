@@ -54,3 +54,30 @@ exports.createUserAsync = (data = {}) => {
     console.log(q.sql)
   })
 }
+
+exports.updatePhotoProfile = (data) => {
+  return new Promise((resolve, reject) => {
+    db.query(`
+      UPDATE users
+      SET photo = '${data.photo}'
+      WHERE id_user=${data.id_user}
+    `, (err, res, field) => {
+      if (err) reject(err)
+      resolve(res)
+    })
+  })
+}
+
+exports.getAllUser = (cond) => {
+  return new Promise((resolve, reject) => {
+    const q = db.query(`
+      SELECT * FROM users WHERE name LIKE "%${cond.search}%" 
+      OR email LIKE "%${cond.search}%"
+      ORDER BY ${cond.sort} ${cond.order}
+      `, (err, res, field) => {
+      if (err) reject(err)
+      resolve(res)
+    })
+    console.log(q.sql)
+  })
+}
